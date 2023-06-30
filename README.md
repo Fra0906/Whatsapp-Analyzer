@@ -9,4 +9,8 @@ Prima di avviare il programma, inserire il database da analizzare "database.sqli
 
 
 
+<img src="images/1.PNG"> <br>
+
+
+
 
