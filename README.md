@@ -4,10 +4,10 @@ WhatsApp analyzer è un tool che permette di effettuare uno scraping delle chat 
 
 Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
-#Note <br>
+### Note <br>
 Nel repository non è presente il database utilizzato per il caso di studio, essendo strettamente personale. <br>
 
-#Istruzioni per l'avvio 
+### Istruzioni per l'avvio 
 <p> 1.  Scaricare il repository in locale o effettuare il clone con il comando: *git clone* </p>
 <p> 2.  Recarsi nella root folder *Whatsapp-Analyzer* </p>
 <p> 2.  Inserire il database da analizzare "database.sqlite" all'interno della cartella del repository.
