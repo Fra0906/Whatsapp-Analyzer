@@ -8,6 +8,11 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 - Effettuare l'estrazione del database di Whatsapp Messenger (i metodi per estrarre il database differiscono da IOS e Android) <br>
 - Nel repository non è presente il database utilizzato per il caso di studio, essendo strettamente personale. <br>
 
+## Indice
+1. [Estrazione database IOS](#estrazione-database-IOS)
+2. [Estrazione database Android](#estrazione-database-Android)
+3. []
+
 ### Istruzioni per l'avvio 
 <p> 1.  Scaricare il repository in locale o effettuare il clone con il comando: git clone
 <p> 2.  Recarsi nella root folder Whatsapp-Analyzer </p>
