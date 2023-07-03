@@ -34,7 +34,7 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
 - Effettuare il backup di iPhone tramite iTunes. <br>
 - Il backup presente al percorso %userprofile%\Apple\MobileSync\Backup è crittografato. <br>
-- Utilizzare il tool Imobax (https://github.com/Siguza/imobax) per scoprire quali dei file è il database di WhatsApp Messenger.
+- Utilizzare il tool Imobax per scoprire quali dei file è il database di WhatsApp Messenger.
 
 ## 3. Estrazione del database Android
 
@@ -340,7 +340,20 @@ where group_name == "ArgoTeam"
 All'avvio si apre questa pagina. Cliccare START per procedere. <br>
 <p> <img src="images/1.png" align="center"> <br>
 
-Sono mostrate all'utente tutte le query disponibili e selezionabili. 
+Sono mostrate all'utente tutte le query disponibili e selezionabili. <br>
+<p> <img src="images/2.png" align="center"> <br>
+
+Esempio di visualizzazione query senza filtro. Premo il pulsante 1. <br>
+viene mostrato a video l'elenco di tutti i nomi dei contatti: <br>
+<p> <img src="images/3.png" align="center"> <br>
+
+Esempio di visualizzazione query con filtro (Ci sono query con 1, 2 o 3 filtri). Premo il pulsante 8. <br>
+Compare la schermata di inserimento dei parametri, nella quale andranno specificati i parametri da utilizzare come filtro per la query, in questo caso contatto 'Mamma' e testo 'si' perchè si vuole cercare la parola “si” all’interno della chat con il contatto “Mamma”. <br>
+*NOTA*: Se voglio che il testo 'si' sia contenuto all'interno di un altra parola andrà inserito in questo modo: %si% <br>
+<p> <img src="images/4.png" align="center"> <br>
+Il risultato è mostrato a video: <br>
+<p> <img src="images/5.png" align="center"> <br>
+
 
 
 
