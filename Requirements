@@ -1,1 +1,9 @@
-
+- Imobax: https://github.com/Siguza/imobax
+- DB Broswer for SQLite (per creare le query): https://sqlitebrowser.org/dl/
+- BlueStacks App Player (emulatore Android)
+- X-plore File Manager: https://play.google.com/store/apps/details?id=com.lonelycatgames.Xplore&hl=it&gl=US
+- Root Checker (per verificare i permessi di root): https://play.google.com/store/apps/details?id=com.joeykrim.rootcheck&hl=it&gl=US
+- Wa-crypt-tool (per aprire il database con la key): https://github.com/ElDavoo/wa-crypt-tools
+- Python (linguaggio utilizzato per lo svilippo del tool)
+- PyCharm (ambiente di sviluppo)
+- Tkinter (per la grafica)
