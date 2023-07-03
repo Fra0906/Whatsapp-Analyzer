@@ -1,198 +1,263 @@
 import sqlite3
-import tkinter as tk
-from tkinter import Entry, ttk
-from tkinter import messagebox
-from tkinter import Frame
-from tkinter import *
-import tkinter.simpledialog as tsd
 
 
-def esegui_query(query, filtri=None):
-    conn = sqlite3.connect("ChatStorage.sqlite")
+def connect_to_database(database):
+    """
+    Crea la connessione al database SQLite specificato.
+    Restituisce un oggetto di connessione.
+    """
+    conn = sqlite3.connect(database)
+    print("MySQL Database connection successful")
+    return conn
+
+
+def execute_select_query(conn, query, parameters=None):
+    """
+    Esegue una query SELECT nel database SQLite specificato.
+    Restituisce i risultati della query come una lista di tuple.
+    Può accettare parametri opzionali per filtrare i record.
+    """
     cursor = conn.cursor()
-
-    if filtri:
-        risultati = cursor.execute(query, filtri).fetchall()
+    if parameters:
+        cursor.execute(query, parameters)
     else:
-        risultati = cursor.execute(query).fetchall()
-
+        cursor.execute(query)
+    results = cursor.fetchall()
     cursor.close()
+    return results
+
+
+def close_connection(conn):
+    """
+    Chiude la connessione al database SQLite specificato.
+    """
     conn.close()
 
-    return risultati
+
+# Funzione per la scelta dell'opzione dal menù
+def menu():
+    print('')
+    print("Menù:")
+    print("1.  Visualizza i nomi di tutti i contatti")
+    print("2.  Visualizza i nomi di tutti i gruppi")
+    print("3.  Top 5 contatti che scrivono i messaggi più lunghi")
+    print("4.  Numero medio di messaggi al giorno scambiati con un contatto nel tempo")
+    print("5.  Momenti della giornata e della settimana nei quali parlo di più con uno specifico contatto.")
+    print("6.  Momenti della giornata e della settimana nei quali parlo di più con un gruppo specifico.")
+    print("7.  Numero di messaggi inviati da ciascun membro di un gruppo nel tempo")
+    print("8.  Cercare una parola all'interno della chat con uno specifico contatto")
+    print("9.  Cercare una parola tra i messaggi in uscita all'interno della chat di un gruppo specifico")
+    print("10. Cercare una parola tra i messaggi in entrata all'interno della chat di un gruppo specifico")
+    print("11. Contare quante volte una determinata parola è stata scritta da uno specifico utente di uno specifico "
+          "gruppo")
+    print("12. Contare quante volte una determinata parola è stata scritta da me all'interno di uno specifico gruppo")
+    print("13. Esci")
+    choice = input("Seleziona un'opzione: ")
+    return choice
 
 
-def esegui_query_senza_filtro(query):
-    risultati = esegui_query(query)
-    messagebox.showinfo("Risultati Query", str(risultati))
+# Definizione delle funzioni di query SELECT
+def nomiContatti(conn):
+    query = "SELECT ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==0 order by ZPARTNERNAME"
+    results = execute_select_query(conn, query)
+    print('')
+    print('I nomi dei contatti sono:')
+    print('')
+    for row in results:
+        print(row)
 
 
-def apri_finestra_2filtri(query):
-    finestra_2filtri = tk.Toplevel(root)
-    finestra_2filtri.title("Inserimento Filtri")
-
-    # Creazione delle etichette e degli entry per i filtri
-    label_filtro1 = tk.Label(finestra_2filtri, text="Contatto:")
-    label_filtro1.grid(row=0, column=0, padx=10, pady=5)
-    entry_filtro1 = tk.Entry(finestra_2filtri)
-    entry_filtro1.grid(row=0, column=1, padx=10, pady=5)
-
-    label_filtro2 = tk.Label(finestra_2filtri, text="Testo:")
-    label_filtro2.grid(row=1, column=0, padx=10, pady=5)
-    entry_filtro2 = tk.Entry(finestra_2filtri)
-    entry_filtro2.grid(row=1, column=1, padx=10, pady=5)
-
-    # Funzione per eseguire la query con i filtri inseriti
-    def esegui_query_con_2filtro():
-        filtro1 = entry_filtro1.get()
-        filtro2 = entry_filtro2.get()
-
-        risultati = esegui_query(query, (filtro1, filtro2))
-        messagebox.showinfo("Risultati Query", str(risultati))
-
-        finestra_2filtri.destroy()
-
-    # Creazione del pulsante per eseguire la query
-    pulsante_esegui = tk.Button(finestra_2filtri, text="Esegui", command=esegui_query_con_2filtro)
-    pulsante_esegui.grid(row=2, column=0, columnspan=2, padx=10, pady=5)
+def nomiGruppi(conn):
+    query = "select ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==1 order by ZPARTNERNAME"
+    results = execute_select_query(conn, query)
+    print('')
+    print('I nomi dei gruppi sono:')
+    print('')
+    for row in results:
+        print(row)
 
 
-# Creazione della finestra principale
-root = tk.Tk()
-root.geometry("1000x700")
-root.resizable(False, False)
-root.rowconfigure(0, weight=1)
-root.columnconfigure(0, weight=1)
-root.title("WhatsApp Analyzer")
+# def SQL1(conn):
+#     query = "SELECT friend_name, count(*) as number_of_messages FROM friend_messages WHERE date(message_date) >= " \
+#             "date('now', '-30 days') GROUP BY friend_number ORDER BY number_of_messages desc"
+#     results = execute_select_query(conn, query)
+#     for row in results:
+#         print(row)
 
-root.configure(bg='#C6E4D9')
-message = tk.Label(root, text="WHATSAPP ANALYZER", background='#C6E4D9', fg="white", bg="#116062", width=55,
-                   height=10, font=('times', 27, ' bold '))
-message.place(x=-90, y=120)
-
-# Creazione del menu
-menu = tk.Menu(root)
-root.config(menu=menu)
-
-# Creazione del menu "Query"
-menu_query = tk.Menu(menu)
-menu.add_cascade(label="Query", menu=menu_query)
+def SQL2(conn):  # NON ESCE LA LISTA DI 5 MA TUTTI
+    query = "SELECT friend_name, avg(length(message_text)) as avg_message_length FROM friend_messages WHERE " \
+            "message_type == 'text' and is_from_me == 0 group by friend_name order by avg_message_length desc "
+    results = execute_select_query(conn, query)
+    print('')
+    print('I nomi dei contatti che scrivono messaggi più lunghi sono:')
+    print('')
+    for row in results:
+        print(row)
 
 
-
-# Aggiunta delle opzioni al menu "Query"
-menu_query.add_command(label="Mostra contatti", command=lambda: esegui_query_senza_filtro(
-    "SELECT ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==0 order by ZPARTNERNAME"))
-
-menu_query.add_command(label="Mostra gruppi", command=lambda: esegui_query_senza_filtro(
-    "select ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==1 order by ZPARTNERNAME"))
-
-
-menu_query.add_command(label="Cercare una parola all'interno della chat con uno specifico contatto", command=lambda: apri_finestra_2filtri(
-    "SELECT friend_name, message_text, message_date, message_type, is_from_me from friend_messages where " \
-            "friend_name  == ? AND message_text LIKE ? "))
-
-menu_query.add_command(label="Cercare una parola tra i messaggi in uscita all'interno della chat di un gruppo specifico", command=lambda: apri_finestra_2filtri(
-    "select message_date,message_type, message_text from group_messages where group_name == ? AND is_from_me " \
-            "== 1 AND message_text LIKE ? "))
+# Definizione delle funzioni di query SELECT con record filtrati
+def SQL3(conn):
+    f_n = input("Inserisci il nome del contatto: ")
+    query = "SELECT day, avg(number_of_messages) over (order by day asc rows 30 preceding) as ma_nom from (SELECT " \
+            "date(message_date) as day, count(*) as number_of_messages from friend_messages where friend_name == ? " \
+            "group by day, friend_name)"
+    results = execute_select_query(conn, query, (f_n,))
+    print('')
+    print('Il numero medio di messaggi al giorno scambiato con il contatto', f_n, 'è:')
+    print('')
+    for row in results:
+        print(row)
 
 
-menu_query.add_command(label="Cercare una parola tra i messaggi in entrata all'interno della chat di un gruppo specifico", command=lambda: apri_finestra_2filtri(
-    "select message_date,message_type, message_text, friend_name, friend_id from group_messages where " \
-            "group_name == ? AND is_from_me == 0 AND message_text LIKE ?"))
+def SQL4(conn):
+    f_n = input("Inserisci il nome del contatto: ")
+    query = "select strftime('%w', message_date) as weekday_number,(case strftime('%w', message_date) when '0' then " \
+            "'Monday' when '1' then 'Tuesday' when '2' then 'Wednesday' when '3' then 'Thursday' when '4' then " \
+            "'Friday' when '5' then 'Saturday'  when '6' then 'Sunday' else 'unknown' end ) as weekday_name, " \
+            "strftime('%H', message_date) as day_hour, count(*) as number_of_messages from friend_messages where " \
+            "friend_name == ? group by weekday_name, day_hour order by weekday_number, day_hour "
+    results = execute_select_query(conn, query, (f_n,))
+    print('')
+    print('I momenti della giornata e della settimana nei quali parlo di più con il contatto', f_n, 'sono:')
+    print('')
+    for row in results:
+        print(row)
 
-# Avvio del ciclo principale Tkinter
-root.mainloop()
 
-# def esegui_query(query, filtri=None):
-#     conn = sqlite3.connect("ChatStorage.sqlite")
-#     cursor = conn.cursor()
-#
-#     if filtri:
-#         risultati = cursor.execute(query, filtri).fetchall()
-#     else:
-#         risultati = cursor.execute(query).fetchall()
-#
-#     cursor.close()
-#     conn.close()
-#
-#     return risultati
-#
-#
-# def apri_finestra_filtri(query):
-#     finestra_filtri = tk.Toplevel(root)
-#     finestra_filtri.title("Inserimento Filtri")
-#
-#     # Creazione delle etichette e degli entry per i filtri
-#     filtri = []
-#     for i, filtro in enumerate(query["filtri"]):
-#         label_filtro = tk.Label(finestra_filtri, text=filtro + ":")
-#         label_filtro.grid(row=i, column=0, padx=10, pady=5)
-#         entry_filtro = tk.Entry(finestra_filtri)
-#         entry_filtro.grid(row=i, column=1, padx=10, pady=5)
-#         filtri.append(entry_filtro)
-#
-#     # Funzione per eseguire la query con i filtri inseriti
-#     def esegui_query_con_filtri():
-#         valori_filtri = [filtro.get() for filtro in filtri]
-#         risultati = esegui_query(query["sql"], valori_filtri)
-#         messagebox.showinfo("Risultati Query", str(risultati))
-#
-#     # Esegui la query automaticamente con filtri
-#     esegui_query_con_filtri()
-#
-#     # Chiudi la finestra dei filtri
-#     finestra_filtri.destroy()
-#
-#
-# def apri_finestra_query(query):
-#     risultati = esegui_query(query["sql"])
-#     messagebox.showinfo("Risultati Query", str(risultati))
-#
-#
-# # Creazione della finestra principale
-# root = tk.Tk()
-# root.title("Applicazione Tkinter")
-#
-# # Definizione delle query con filtri e senza filtri
-# query_con_filtri = [
-#     {
-#         "label": "Query 1",
-#         "sql": "SELECT day, avg(number_of_messages) over (order by day asc rows 30 preceding) as ma_nom from (SELECT " \
-#                "date(message_date) as day, count(*) as number_of_messages from friend_messages where friend_name == ? " \
-#                "group by day, friend_name)",
-#         "filtri": ["Valore Colonna 1"]
-#     },
-#     {
-#         "label": "Query 2",
-#         "sql": "SELECT friend_name, message_text, message_date, message_type, is_from_me from friend_messages where " \
-#                "friend_name  == ? AND message_text LIKE ?",
-#         "filtri": ["Valore Colonna 2", "Valore Colonna 3"]
-#     }
-# ]
-#
-# query_senza_filtri = [
-#     {
-#         "label": "Query 3",
-#         "sql": "SELECT ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==0 order by ZPARTNERNAME"
-#     },
-#     {
-#         "label": "Query 4",
-#         "sql": "select ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==1 order by ZPARTNERNAME"
-#     }
-# ]
-#
-# # Creazione del menu con le query
-# menu = tk.Menu(root)
-# root.config(menu=menu)
-#
-# menu_query = tk.Menu(menu)
-# menu.add_cascade(label="Query con Filtri", menu=menu_query)
-#
-# for query in query_con_filtri:
-#     menu_query.add_command(label=query["label"], command=lambda q=query: apri_finestra_filtri(q))
-#
-# menu_query_senza_filtri = tk.Menu(menu)
-# menu.add_cascade(label="Query senza Filtri", menu=menu_query_senza_filtri)
-#
-# root.mainloop()
+def SQL4variante(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    query = "select strftime('%w', message_date) as weekday_number,(case strftime('%w', message_date) when '0' then " \
+            "'Monday' when '1' then 'Tuesday' when '2' then 'Wednesday' when '3' then 'Thursday' when '4' then " \
+            "'Friday' when '5' then 'Saturday'  when '6' then 'Sunday' else 'unknown' end ) as weekday_name, " \
+            "strftime('%H', message_date) as day_hour, count(*) as number_of_messages from group_messages where " \
+            "group_name == ? group by weekday_name, day_hour order by weekday_number, day_hour "
+    results = execute_select_query(conn, query, (g_n,))
+    print('')
+    print('I momenti della giornata e della settimana nei quali parlo di più con il gruppo', g_n, 'sono:')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL5(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    query = "select friend_name, day, avg(number_of_sent_messages) over ( order by friend_name, day asc rows 30 " \
+            "preceding ) as ma_nom from ( select ( case is_from_me when 0 then friend_name else 'Me' end) as " \
+            "friend_name,date(message_date) as day,count(*) as number_of_sent_messages from group_messages where " \
+            "group_name == ? group by friend_name,day )"
+    results = execute_select_query(conn, query, (g_n,))
+    print('')
+    print('I momenti della giornata e della settimana nei quali parlo di più con il gruppo', g_n, 'sono:')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL6(conn):
+    f_n = input("Inserisci il nome del contatto: ")
+    m_t = input("Inserisci il testo da cercare: ")
+    query = "SELECT friend_name, message_text, message_date, message_type, is_from_me from friend_messages where " \
+            "friend_name  == ? AND message_text LIKE ? "
+    results = execute_select_query(conn, query, (f_n, m_t))
+    print('')
+    print('Cercare la parola', m_t, 'nella chat con il contatto', f_n, ':')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL7(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    m_t = input("Inserisci il testo da cercare: ")
+    query = "select message_date,message_type, message_text from group_messages where group_name == ? AND is_from_me " \
+            "== 1 AND message_text LIKE ? "
+    results = execute_select_query(conn, query, (g_n, m_t))
+    print('')
+    print('Cercare la parola', m_t, 'tra i messaggi in uscita all interno della chat del gruppo', g_n, ':')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL8(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    m_t = input("Inserisci il testo da cercare: ")
+    query = "select message_date,message_type, message_text, friend_name, friend_id from group_messages where " \
+            "group_name == ? AND is_from_me == 0 AND message_text LIKE ? "
+    results = execute_select_query(conn, query, (g_n, m_t))
+    print('')
+    print('Cercare la parola', m_t, 'tra i messaggi in entrata all interno della chat del gruppo', g_n, ':')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL9(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    f_n = input("Inserisci il nome del contatto:")
+    m_t = input("Inserisci il testo da cercare: ")
+    query = "select count(*) as number_of_messages, friend_name, friend_id, group_name, group_id from group_messages " \
+            "where group_name == ? AND is_from_me == 0 AND friend_name == ? AND message_text LIKE ? "
+    results = execute_select_query(conn, query, (g_n, f_n, m_t))
+    print('')
+    print('Contare quante volte la parola', m_t, 'è stata scritta dal contatto', f_n, 'presente nel gruppo', g_n, ':')
+    print('')
+    for row in results:
+        print(row)
+
+
+def SQL10(conn):
+    g_n = input("Inserisci il nome del gruppo: ")
+    m_t = input("Inserisci il testo da cercare: ")
+    query = "select count(*) as number_of_messages, group_name, group_id from group_messages where group_name == ? " \
+            "AND is_from_me == 1 AND message_text LIKE ? "
+    results = execute_select_query(conn, query, (g_n, m_t))
+    print('')
+    print('Contare quante volte la parola', m_t, 'è stata scritta nel gruppo', g_n, ':')
+    print('')
+    for row in results:
+        print(row)
+
+
+# Esecuzione del menu
+def main():
+    conn = connect_to_database('ChatStorage.sqlite')
+
+    while True:
+        choice = menu()
+
+        if choice == '1':
+            nomiContatti(conn)
+        elif choice == '2':
+            nomiGruppi(conn)
+        elif choice == '3':
+            SQL2(conn)
+        elif choice == '4':
+            SQL3(conn)
+        elif choice == '5':
+            SQL4(conn)
+        elif choice == '6':
+            SQL4variante(conn)
+        elif choice == '7':
+            SQL5(conn)
+        elif choice == '8':
+            SQL6(conn)
+        elif choice == '9':
+            SQL7(conn)
+        elif choice == '10':
+            SQL8(conn)
+        elif choice == '11':
+            SQL9(conn)
+        elif choice == '12':
+            SQL10(conn)
+        elif choice == '13':
+            break
+        else:
+            print("Opzione non valida. Riprova.")
+
+    close_connection(conn)
+
+
+# Avvio del programma
+if __name__ == "__main__":
+    main()
