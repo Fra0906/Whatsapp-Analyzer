@@ -12,6 +12,7 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 1. [Prerequisiti](#prerequisiti)
 2. [Estrazione database IOS](#estrazione-database-IOS)
 3. [Estrazione database Android](#estrazione-database-Android)
+4. [Creazione viste](#creazione-viste)
 5. [Query utilizzate](#query-utilizzate)
 6. [Istruzioni per l'avvio](#istruzioni-per-l'avvio)
 7. [Funzionamento del tool](#funzionamento-del-tool)
@@ -32,11 +33,11 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 - Uso l'app X-plore per accedere ad aree riservate del dispositivo, recuperando il database e la key di WhatsApp Messenger.
 
 
-## 4. Query utilizzate
+## 4. Creazione viste
 
-Per prima cosa credo due viste, una per i gruppi e una per i contatti. <br>
+Creo due viste all’interno del database: una per i messaggi privati, individuali, che chiamo friends_messages e un’altra per i messaggi delle chat di gruppo che chiamo group_messages. <br>
 
-*Vista friend_messages*: <br>
+**Vista friend_messages**: <br>
 ```
 create view friend_messages as
 select
@@ -71,9 +72,9 @@ where
 ZWACHATSESSION.ZSESSIONTYPE == 0
  ```
 <br>
+**vista group_messagess**:  <br>
 
 ```
-*vista group_messagess*:
 create view group_messages as
 select
 ZWACHATSESSION.ZPARTNERNAME as group_name,
@@ -112,15 +113,217 @@ ZWACHATSESSION.ZSESSIONTYPE == 1
 and message_type not in ('unknown', 'group_event');
  ```
 
+## 5. Query utilizzate
 
-## 5. Istruzioni per l'avvio 
+Segue l'elenco delle query create. <br>
+
+**1. Visualizza i nomi di tutti i contatti** <br>
+```
+select ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==0
+order by ZPARTNERNAME;
+```
+
+**2. Visualizza i nomi di tutti i gruppi** <br>
+```
+select ZPARTNERNAME from ZWACHATSESSION where ZSESSIONTYPE==1
+order by ZPARTNERNAME;
+```
+
+**3. Top contatti che scrivono i messaggi più lunghi** <br>
+```
+select
+  friend_name,
+  avg(length(message_text)) as avg_message_length
+from
+  friend_messages
+where
+  message_type == "text"
+  and is_from_me == 0
+group by
+  friend_name
+order by
+  avg_message_length desc
+```
+
+**4. Numero medio di messaggi al giorno scambiati con un contatto nel tempo** <br>
+```
+select 
+  day,
+  avg(number_of_messages) over (
+    order by
+      day asc rows 30 preceding
+  ) as ma_nom
+from
+  (
+    SELECT
+      date(message_date) as day,
+      count(*) as number_of_messages
+    from
+      friend_messages
+    where
+      friend_name == "Mamma"
+    group by
+      day,
+      friend_name
+  )
+```
+
+**5. Momenti della giornata e della settimana nei quali parlo di più con uno specifico contatto** <br>
+```
+select
+  
+  strftime('%w', message_date) as weekday_number,
+  (
+    case
+      strftime('%w', message_date)
+      when '0' then 'Monday'
+      when '1' then 'Tuesday'
+      when '2' then 'Wednesday'
+      when '3' then 'Thursday'
+      when '4' then 'Friday'
+      when '5' then 'Saturday'
+      when '6' then 'Sunday'
+      else 'unknown'
+    end
+  ) as weekday_name,
+  strftime('%H', message_date) as day_hour,
+  count(*) as number_of_messages
+from
+  friend_messages
+where
+  friend_name == 'Mamma'
+group by
+  weekday_name, day_hour
+order by
+  weekday_number, day_hour
+```
+
+**6. Momenti della giornata e della settimana nei quali parlo di più con un gruppo specifico** <br>
+```
+select
+  
+  strftime('%w', message_date) as weekday_number,
+  (
+    case
+      strftime('%w', message_date)
+      when '0' then 'Monday'
+      when '1' then 'Tuesday'
+      when '2' then 'Wednesday'
+      when '3' then 'Thursday'
+      when '4' then 'Friday'
+      when '5' then 'Saturday'
+      when '6' then 'Sunday'
+      else 'unknown'
+    end
+  ) as weekday_name,
+  strftime('%H', message_date) as day_hour,
+  count(*) as number_of_messages
+from
+  group_messages
+where
+  group_name == 'ArgoTeam'
+group by
+  weekday_name, day_hour
+order by
+  weekday_number, day_hour
+```
+
+**7. Numero di messaggi inviati da ciascun membro di un gruppo nel tempo** <br>
+```
+select
+  friend_name,
+  day,
+  avg(number_of_sent_messages) over (
+    order by
+      friend_name,
+      day asc rows 30 preceding
+  ) as ma_nom
+from
+  (
+    select
+      (
+        case
+          is_from_me
+          when 0 then friend_name
+          else 'Me'
+        end
+      ) as friend_name,
+      date(message_date) as day,
+      count(*) as number_of_sent_messages
+    from
+      group_messages
+    where
+      group_name == "ArgoTeam"
+    group by
+      friend_name,
+      day
+  );
+```
+
+**8. Cercare una parola all'interno della chat con uno specifico contatto** <br>
+```
+select  message_date,message_type, message_text, is_from_me
+
+from friend_messages
+
+where friend_name == "Mamma" AND
+	message_text LIKE '%ok%'
+```
+
+**9. Cercare una parola tra i messaggi in uscita all'interno della chat di un gruppo specifico** <br>
+```
+select message_date,message_type, message_text
+
+from group_messages
+
+where group_name == "ArgoTeam" 
+	AND is_from_me == 1
+	AND message_text LIKE '%si%'
+```
+
+**10. Cercare una parola tra i messaggi in entrata all'interno della chat di un gruppo specifico** <br>
+```
+select message_date, message_type, message_text, friend_name, friend_id
+
+from group_messages
+
+where group_name == "ArgoTeam" 
+	AND is_from_me == 0
+	AND message_text LIKE '%si%'
+```
+
+**11. Contare quante volte una determinata parola è stata scritta da uno specifico utente di uno specifico gruppo** <br>
+
+```
+select count(*) as number_of_messages, friend_name, friend_id, group_name, group_id
+from group_messages
+where group_name == "ArgoTeam" 
+	AND is_from_me == 0
+	AND friend_name == 'Sara Uni'
+	AND message_text LIKE '%si%'
+
+```
+
+**12. Contare quante volte una determinata parola è stata scritta da me all'interno di uno specifico gruppo** <br>
+
+```
+select count(*) as number_of_messages, group_name, group_id
+from group_messages
+where group_name == "ArgoTeam" 
+	AND is_from_me == 1
+	AND message_text LIKE '%si%'
+
+```
+
+
+## 6. Istruzioni per l'avvio 
 <p> 1.  Scaricare il repository in locale o effettuare il clone con il comando: git clone
 <p> 2.  Recarsi nella root folder Whatsapp-Analyzer </p>
 <p> 2.  Inserire il database da analizzare "database.sqlite" all'interno della cartella del repository.
 <p> 3.  Avviare il tool da terminale con il comando python main.py
 
 
-## 6. Funzionamento del tool
+## 7. Funzionamento del tool
 
 
 <p> <img src="images/1.png" align="center"> <br>
