@@ -84,7 +84,7 @@ def nomiGruppi(conn):
 #     for row in results:
 #         print(row)
 
-def SQL2(conn):  # NON ESCE LA LISTA DI 5 MA TUTTI
+def SQL2(conn):  
     query = "SELECT friend_name, avg(length(message_text)) as avg_message_length FROM friend_messages WHERE " \
             "message_type == 'text' and is_from_me == 0 group by friend_name order by avg_message_length desc "
     results = execute_select_query(conn, query)
