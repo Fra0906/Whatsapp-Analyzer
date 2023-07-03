@@ -338,10 +338,10 @@ where group_name == "ArgoTeam"
 ## 7. Funzionamento del tool
 
 All'avvio si apre questa pagina. Cliccare START per procedere. <br>
-<p> <img src="images/1.png" align="center" alt="drawing" width="800> <br>
+<p> <img src="images/1.png" align="center" alt="drawing" width="800"> <br>
 
 Sono mostrate all'utente tutte le query disponibili e selezionabili. <br>
-<p> <img src="images/2.png" align="center" alt="drawing" width="600> <br>
+<p> <img src="images/2.png" align="center" alt="drawing" width="600">  <br>
 
 Esempio di visualizzazione query senza filtro. Premo il pulsante 1. <br>
 viene mostrato a video l'elenco di tutti i nomi dei contatti: <br>
