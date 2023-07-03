@@ -5,8 +5,8 @@ WhatsApp analyzer è un tool che permette di effettuare uno scraping delle chat 
 Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
 ### Note <br>
-- Effettuare l'estrazione del database di Whatsapp Messenger (i metodi per estrarre il database differiscono da IOS e Android) <br>
 - Nel repository non è presente il database utilizzato per il caso di studio, essendo strettamente personale. <br>
+- Tutti i riferimenti a persone, gruppi e contatti sono stati oscusati per privacy.
 
 ## Indice
 1. [Prerequisiti](#prerequisiti)
