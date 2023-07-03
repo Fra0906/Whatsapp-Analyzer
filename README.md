@@ -20,6 +20,16 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
 ## 1. Prerequisiti 
 
+- Imobax: https://github.com/Siguza/imobax
+- DB Broswer for SQLite (per creare le query): https://sqlitebrowser.org/dl/
+- BlueStacks App Player (emulatore Android)
+- X-plore File Manager: https://play.google.com/store/apps/details?id=com.lonelycatgames.Xplore&hl=it&gl=US
+- Root Checker (per verificare i permessi di root): https://play.google.com/store/apps/details?id=com.joeykrim.rootcheck&hl=it&gl=US
+- Wa-crypt-tool (per aprire il database con la key): https://github.com/ElDavoo/wa-crypt-tools
+- Python (linguaggio utilizzato per lo svilippo del tool)
+- PyCharm (ambiente di sviluppo)
+- Tkinter (per la grafica)
+
 ## 2. Estrazione del database IOS
 
 - Effettuare il backup di iPhone tramite iTunes. <br>
@@ -72,6 +82,7 @@ where
 ZWACHATSESSION.ZSESSIONTYPE == 0
  ```
 <br>
+
 **vista group_messagess**:  <br>
 
 ```
@@ -115,6 +126,7 @@ and message_type not in ('unknown', 'group_event');
 
 ## 5. Query utilizzate
 
+Le prime tre query sono senza filtri. Tutte le altre presentano dei filtri. <br>
 Segue l'elenco delle query create. <br>
 
 **1. Visualizza i nomi di tutti i contatti** <br>
@@ -325,8 +337,11 @@ where group_name == "ArgoTeam"
 
 ## 7. Funzionamento del tool
 
-
+All'avvio si apre questa pagina. Cliccare START per procedere. <br>
 <p> <img src="images/1.png" align="center"> <br>
+
+Sono mostrate all'utente tutte le query disponibili e selezionabili. 
+
 
 
 
