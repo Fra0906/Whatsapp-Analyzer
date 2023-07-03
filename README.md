@@ -33,7 +33,7 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 ## 2. Estrazione del database IOS
 
 - Effettuare il backup di iPhone tramite iTunes. <br>
-- Il backup presente al percorso %userprofile%\Apple\MobileSync\Backup è crittografato. <br>
+- Il backup presente al percorso *%userprofile%\Apple\MobileSync\Backup* è crittografato. <br>
 - Utilizzare il tool Imobax per scoprire quali dei file è il database di WhatsApp Messenger.
 
 ## 3. Estrazione del database Android
@@ -45,7 +45,7 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
 ## 4. Creazione viste
 
-Creo due viste all’interno del database: una per i messaggi privati, individuali, che chiamo friends_messages e un’altra per i messaggi delle chat di gruppo che chiamo group_messages. <br>
+Creo due viste all’interno del database: una per i messaggi privati, individuali, che chiamo *friends_messages* e un’altra per i messaggi delle chat di gruppo che chiamo *group_messages*. <br>
 
 **Vista friend_messages**: <br>
 ```
