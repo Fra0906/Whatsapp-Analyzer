@@ -6,7 +6,7 @@ Lavoro di tesi magistrale in Sicurezza Informatica. <br>
 
 ### Note <br>
 - Nel repository non è presente il database utilizzato per il caso di studio, essendo strettamente personale. <br>
-- Tutti i riferimenti a persone, gruppi e contatti sono stati oscusati per privacy.
+- Tutti i riferimenti a persone, gruppi e contatti sono stati oscurati per privacy.
 
 ## Indice
 1. [Prerequisiti](#prerequisiti)
